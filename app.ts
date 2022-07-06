@@ -1,8 +1,13 @@
 import express from 'express';
 const app = express();
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/user');
 
-app.get('/', function(req, res) {
-    res.send("Express is running");
-});
+app.use(express.json());
+app.use(express.urlencoded({
+  extended: false
+}));
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
 
 module.exports = app;
