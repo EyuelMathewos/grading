@@ -8,11 +8,13 @@
     "startdev": "ts-node ./index",
     "dev": "nodemon ./index.ts",
     "build": "tsc",
+    "test": "cucumber-js",
     "seed": "ts-node ./seed/seed.ts"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@cucumber/cucumber": "^8.4.0",
     "@types/node": "^18.0.3",
     "nodemon": "^2.0.19",
     "prisma": "^4.0.0",
