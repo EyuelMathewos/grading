@@ -32,5 +32,4 @@ Then('user will be notify account created', function () {
  }{
    return response;
  }
-// return 'pending';
 });
