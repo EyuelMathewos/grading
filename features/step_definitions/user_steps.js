@@ -1,35 +1,53 @@
 const { Given, When, Then } = require('@cucumber/cucumber');
-
+const Validator = require('validatorjs');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient()
 let data,response, error;
-Given('account information', function () {
- this.data = {
-  email :"test5@gmail.com",     
-  firstName:"test5", 
-  lastName:"data1",  
-  social:[]
-}
-return data;
+let statusValues=[];
+const createValidation = {
+  "email": "required|email",
+  "firstName": "required|string",
+  "lastName": "required|string"
+};
+const validator = ( body, rules, customMessages ) => {
+    return new Promise(async function (resolve, reject) {
+        const validation = new Validator(body, rules, customMessages);
+        validation.passes(() => resolve({status:true}));
+        validation.fails(() => {
+            validation.errors.status=false
+            reject(validation.errors)
+        });
+    })
+};
+Given('account information', function (dataTable) {
+  data = dataTable.hashes()
+  return data;
 });
 
 When('registers for a new account', async function () {
-try {
-    response = await prisma.user.create({
-    data: this.data,
-  })
-  return response;
-}catch(error){
-  error = error;
-  console.log(error)
- return error;
-}
+ // data
+  for (const key in data) {
+    //console.log(`value `,data[key])
+    let value = validator(data[key], createValidation, {}).then(async (response) => {
+      validity = response
+      statusValues.push("pass");
+     }).catch(error=>{
+       errorval = error
+       statusValues.push("fail");
+     })
+
+  }
 });
 
-Then('user will be notify account created', function () {
- if(error){
-  return "faild to create user"
- }{
-   return response;
- }
+Then('the following are expected value should be', function (dataTable) {
+  let compareVal = dataTable.hashes();
+    for (const key in compareVal) {
+      console.log(`${compareVal[key].email} ${compareVal[key].expected} values ${statusValues[key]} `) 
+      if(compareVal[key].expected == statusValues[key]){
+        console.log(`${compareVal[key].email} ${compareVal[key].expected} values ${statusValues[key]} `) 
+      }
+      //  else{
+      //   throw("condition not meet")
+      // }
+    }
 });
