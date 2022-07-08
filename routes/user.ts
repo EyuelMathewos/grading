@@ -6,7 +6,7 @@ const {validator} = require('../validator/index');
 const {createValidation} = require('../validator/userValidation');
 router.route("/")
 .get(async (req: Request, res: Response) => {
-    const user = await prisma.user.findMany({});
+    const user = await prisma.User.findMany({});
     res.json(user);
 })
 .post(async (req: Request, res: Response) => {
@@ -14,7 +14,7 @@ router.route("/")
     validator(req.body, createValidation, {}).then(async (response: any) => {
       const valdationStatus: boolean = response.status;
       if( valdationStatus ){
-            const user = await prisma.user.create({
+            const user = await prisma.User.create({
               data: {
                 email: req.body.email,
                 firstName: req.body.firstName,
@@ -33,4 +33,18 @@ router.route("/")
     }
 
 })
+
+//CourseEnrollment
+router.route("/:userId/courses")
+    .get(async (req: Request, res: Response) => {
+        const userId = parseInt(req.params.userId);
+        const courseenrollment = await prisma.CourseEnrollment.findMany({
+            where: {
+              userId,
+            },
+        }).catch((error: string) => {
+            res.json(error)
+        })
+        res.json(courseenrollment);
+    })
 module.exports = router;
