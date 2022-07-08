@@ -8,7 +8,7 @@
     "startdev": "ts-node ./index",
     "dev": "nodemon ./index.ts",
     "build": "tsc",
-    "test": "cucumber-js  --tags @wip",
+    "test": "cucumber-js  --tags",
     "seed": "ts-node ./seed/seed.ts"
   },
   "author": "",
