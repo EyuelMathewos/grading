@@ -4,6 +4,10 @@ const router = express.Router();
 const prisma = new PrismaClient();
 const {validator} = require('../validator/index');
 const {createValidation} = require('../validator/userValidation');
+enum UserRole {
+  STUDENT,
+  TEACHER
+}
 router.route("/")
 .get(async (req: Request, res: Response) => {
     const user = await prisma.User.findMany({});
@@ -38,13 +42,26 @@ router.route("/")
 router.route("/:userId/courses")
     .get(async (req: Request, res: Response) => {
         const userId = parseInt(req.params.userId);
-        const courseenrollment = await prisma.CourseEnrollment.findMany({
-            where: {
-              userId,
-            },
-        }).catch((error: string) => {
+        const courseenrollment = await prisma.CourseEnrollment.create({
+           
+        }).catch((error: Error) => {
             res.json(error)
         })
         res.json(courseenrollment);
     })
+    .post(async (req: Request, res: Response) => {
+      let data = {
+        role: parseInt(req.body.role),
+        userId: parseInt(req.body.userId),
+        courseId: parseInt(req.body.courseId)
+      };
+      const courseenrollment = await prisma.CourseEnrollment.create(
+        {
+          data
+        }
+      ).catch((error: Error) => {
+          res.json(error)
+      })
+      res.json(courseenrollment);
+  })
 module.exports = router;
