@@ -1,7 +1,7 @@
 const { Given, When, Then } = require('@cucumber/cucumber');
 const { validator } = require('../../validator/index');
 const { createValidation } = require('../../validator/userValidation');
-
+const { assertThat, is } = require('hamjest')
 let data:any;
 let statusValues:any = {};
 
@@ -17,10 +17,7 @@ When('registers for a new account', async function () {
       const valdationStatus:boolean = response.status;
       if (valdationStatus) {
         statusValues[key] = "pass";
-      } else {
-        statusValues[key] = "fail";
       }
-
     }).catch((error: any) => {
       console.log(error)
       statusValues[key] = "fail";
@@ -32,8 +29,6 @@ When('registers for a new account', async function () {
 Then('the following are expected value should be', function (dataTable: { hashes: () => any; }) {
   let compareVal = dataTable.hashes();
   for (const key in compareVal) {
-    if (compareVal[key].expected == statusValues[key]) {
-      console.log(`${compareVal[key].email} ${compareVal[key].expected} values ${statusValues[key]} `)
-    }
+    assertThat( statusValues[key], is(compareVal[key].expected) )
   }
 });

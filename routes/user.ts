@@ -5,6 +5,10 @@ const prisma = new PrismaClient();
 const {validator} = require('../validator/index');
 const {createValidation} = require('../validator/userValidation');
 router.route("/")
+.get(async (req: Request, res: Response) => {
+    const user = await prisma.user.findMany({});
+    res.json(user);
+})
 .post(async (req: Request, res: Response) => {
   try{
     validator(req.body, createValidation, {}).then(async (response: any) => {
