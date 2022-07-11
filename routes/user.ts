@@ -42,8 +42,10 @@ router.route("/")
 router.route("/:userId/courses")
     .get(async (req: Request, res: Response) => {
         const userId = parseInt(req.params.userId);
-        const courseenrollment = await prisma.CourseEnrollment.create({
-           
+        const courseenrollment = await prisma.CourseEnrollment.findMany({
+          where: {
+            userId 
+          },
         }).catch((error: Error) => {
             res.json(error)
         })

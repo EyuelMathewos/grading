@@ -1,34 +1,33 @@
+import supertest from "supertest";
+import { assertThat } from 'hamjest';
 const { Given, When, Then } = require('@cucumber/cucumber');
-const { validator } = require('../../validator/index');
-const { createValidation } = require('../../validator/userValidation');
-const { assertThat, is } = require('hamjest')
-let data:any;
-let statusValues:any = {};
+const userapi = require("../../app");
+const request = supertest(userapi);
 
-Given('account information', function (dataTable:any) {
+let data: Array<object>;
+let statusValues: Array <number> = [];
+let response: any;
+
+Given('account information', function (dataTable: any) {
   data = dataTable.hashes()
   return data;
+
 });
 
 When('registers for a new account', async function () {
   for (const key in data) {
-    let value = validator(data[key], createValidation, {}).then(async (response:any) => {
-      let validity = response
-      const valdationStatus:boolean = response.status;
-      if (valdationStatus) {
-        statusValues[key] = "pass";
-      }
-    }).catch((error: any) => {
-      console.log(error)
-      statusValues[key] = "fail";
-    })
-
+    let userData = data[key];
+    response = await request.post("/api/users/").send(userData);
+    statusValues[parseInt(key)] = response.status;
   }
 });
 
-Then('the following are expected value should be', function (dataTable: { hashes: () => any; }) {
-  let compareVal = dataTable.hashes();
-  for (const key in compareVal) {
-    assertThat( statusValues[key], is(compareVal[key].expected) )
+Then('Then should get a response with status code {int} or {int}', function (success: number, fail: number) {
+  for (const key in statusValues) {
+    if (statusValues[key] == success) {
+      assertThat(statusValues[key], success);
+    } else {
+      assertThat(statusValues[key], fail);
+    }
   }
 });
