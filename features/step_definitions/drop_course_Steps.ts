@@ -1,23 +1,22 @@
 import { Given, When, Then } from '@cucumber/cucumber';
-const { assertThat, is } = require('hamjest')
-let userdata: any;
-let currently_Taking: any , droping_Course: any;
-let Newly_Filtered:any;
+import supertest from "supertest";
+import { assertThat } from 'hamjest';
+const userapi = require("../../app");
+const request = supertest( userapi );
+
+let  user:any, id:number, courseId:number, course:any , droping_Course: any, response:any;
+
 Given('student siginup with this account info', function (dataTable) {
- userdata = dataTable.hashes();
+    user = dataTable.hashes();
+    id = user[0].id;
 });
 
-Given('student taking courses list are', function (dataTable) {
-    currently_Taking = dataTable.hashes();
+When('student drop for course <courseId>', async function (dataTable) {
+    course = dataTable.hashes();
+    courseId = course[0].courseId;
+    droping_Course = await request.delete(`/api/users/${id}/courses/${courseId}`);
 });
 
-When('student drop for course from list', function (dataTable) { 
-    droping_Course = dataTable.hashes();
-    let courseId = droping_Course[0].courseId;
-    Newly_Filtered = currently_Taking.filter((elements: any) => elements.courseId !==  courseId );
-});
-
-Then('Student enrolled list after droping course should look like', function (dataTable) {
-    const Expected_values = dataTable.hashes();
-    assertThat( Newly_Filtered, is(Expected_values) );
+Then('droping course should get response of {int}', function (statusCode) {
+    assertThat(droping_Course.status, statusCode )
 });

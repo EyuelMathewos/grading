@@ -66,4 +66,21 @@ router.route("/:userId/courses")
       })
       res.json(courseenrollment);
   })
+  router.route("/:userId/courses/:courseId")
+  .delete(async (req: Request, res: Response) => {
+    const userId = parseInt(req.params.userId);
+    const courseId = parseInt(req.params.courseId);
+    const course = await prisma.CourseEnrollment.delete({
+      where: {
+        userId_courseId:{
+          userId,
+          courseId,
+        }
+        
+      },
+    }).catch((error: Error) => {
+      res.json(error)
+    });
+    res.json(course)
+  })
 module.exports = router;
